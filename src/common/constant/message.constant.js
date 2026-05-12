@@ -1,8 +1,8 @@
 const generateMessage=(entity)=>{
    return {
-    alreadyExist:`${entity} already exists`,
-    notFound:`${entity} not found`,
-    login:`${entity} login successfully`,
+    alreadyExist:`already exists`,
+    notFound:`not found`,
+    login:`Login successfully`,
     failedToCreate:`${entity} failed to create`,
     failedToUpdate:`${entity} failed to update`,
     faildToDelete:`${entity} failed to delete`,
