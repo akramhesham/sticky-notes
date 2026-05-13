@@ -1,4 +1,5 @@
 import { DBRepository } from "../../db.repository.js";
+import { Notes } from "./notes.model.js";
 
 class NotesRepository extends DBRepository{
     constructor(){

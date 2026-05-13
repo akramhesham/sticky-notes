@@ -10,6 +10,12 @@ export class DBRepository{
     async update(filter,update,options={new:true}){
         return await this.nModel.findOneAndUpdate(filter,update,options);
     }
+    async replace(filter,data,options={new:true}){
+        return await this.nModel.findOneAndReplace(filter,data,options);
+    }
+    async updateAll(filter={},data){
+        return await this.nModel.updateMany(filter,data);
+    }
     async getOne(filter,projection={},options={}){
         return await this.nModel.findOne(filter,projection,options);
     }

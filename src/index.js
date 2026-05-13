@@ -1,7 +1,7 @@
 import express from 'express';
 import { connectDB } from './DB/connection.js';
 import mongoose from 'mongoose';
-import { usersRouter } from './modules/index.js';
+import { notesRouter, usersRouter } from './modules/index.js';
 import { SYS_MESSAGE } from './common/constant/message.constant.js';
 
 const app=express();
@@ -9,6 +9,7 @@ const port=3000;
 connectDB();
 app.use(express.json());
 app.use('/users',usersRouter);
+app.use('/notes',notesRouter);
 app.use((err,req,res,next)=>{
     return res.status(err.cause||500).json({
         message:err.message,
