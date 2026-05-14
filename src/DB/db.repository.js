@@ -25,4 +25,7 @@ export class DBRepository{
     async deleteOne(filter){
         return await this.nModel.deleteOne(filter)
     }
+    async deleteMany(filter){
+        return await this.nModel.deleteMany(filter);
+    }
 }

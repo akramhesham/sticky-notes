@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createSingleNote, deleteNote, getNote, getNoteByContent, replaceNote, updateAllFields, updateNote } from "./notes.service.js";
+import { aggregateNotesByTitle, createSingleNote, deleteNote, deleteNotes, getNote, getNoteByContent, noteWithUser, paginatedSort, replaceNote, updateAllFields, updateNote } from "./notes.service.js";
 import { ConflictException } from "../../common/utils/error.utils.js";
 
 const router=Router();
@@ -37,7 +37,12 @@ router.delete('/:noteId',async(req,res,next)=>{
     return res.status(200).json({message:'deleted',success:true,note:deletedData});
 })
 
-// Q6
+router.get('/paginate-sort',async(req,res,next)=>{
+    const {page,limit}=req.query;
+    const {authorization}=req.headers;
+    const noteData=await paginatedSort(authorization,page,limit);
+    return res.status(201).json({message:noteData,success:true});
+})
 
 router.get('/note-by-content',async(req,res,next)=>{
     const {content}=req.query;
@@ -46,19 +51,30 @@ router.get('/note-by-content',async(req,res,next)=>{
     return res.status(201).json({message:data,success:true});
 })
 
+router.get('/note-with-user',async(req,res,next)=>{
+    const {authorization}=req.headers;
+    const noteData=await noteWithUser(authorization);
+    return res.status(201).json({message:noteData,success:true})
+})
+
+router.get('/aggregate',async(req,res,next)=>{
+    const {authorization}=req.headers;
+    const {title}=req.query;
+    const noteData=await aggregateNotesByTitle(authorization,title);
+    return res.status(201).json({message:noteData,success:true});
+})
+
+router.delete('/',async(req,res,next)=>{
+    const {authorization}=req.headers;
+    await deleteNotes(authorization);
+    return res.status(200).json({message:'Deleted',success:true});
+})
+
 router.get('/:noteId',async(req,res,next)=>{
     const {authorization}=req.headers;
     const {noteId}=req.params;
     const noteData=await getNote(authorization,noteId);
     return res.status(200).json({message:noteData,success:true});
 })
-
-// Q7
-
-// Q9
-
-// Q10
-
-// Q11
 
 export default router;

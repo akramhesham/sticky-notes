@@ -22,7 +22,6 @@ export const noteExist = async (noteId) => {
 export const updateNote = async (authorization, noteId, data) => {
     const headUserId = await tokenHead(authorization);
     const noteData = await noteExist({ _id: noteId });
-    console.log({ noteId })
     if (!noteData) {
         throw new ConflictException('Note not found');
     }
@@ -64,7 +63,6 @@ export const checkOwnerNotes = async (authorization, noteId) => {
     if (headUserId != noteUserId) {
         throw new ConflictException('You are not the owner');
     }
-    console.log({ noteData })
     return noteData;
 }
 export const deleteNote = async (authorization, noteId) => {
@@ -86,4 +84,66 @@ export const getNoteByContent=async(authorization,content)=>{
         throw new ConflictException('No note found');
     }
     return notes;
+}
+
+export const paginatedSort=async(authorization,page,limit)=>{
+    const headUserId=await tokenHead(authorization);
+    const noteData=await notesRepository.getAll({userId:new Types.ObjectId(headUserId)},{},{
+        sort:{createdAt:-1},
+        limit,
+        skip:(page-1)*limit
+    })
+    if(!noteData.length){
+        throw new ConflictException('No notes found')
+    }
+    return noteData;
+}
+
+export const noteWithUser=async(authorization)=>{
+    const headUserId=await tokenHead(authorization);
+    const noteData=await notesRepository.getAll({userId:new Types.ObjectId(headUserId)},{
+        title:1,userId:1,createdAt:1
+    },{
+        populate:{
+            path:'userId',
+            select:'email -_id'
+        }
+    })
+    if(!noteData.length){
+        throw new ConflictException('No note found')
+    }
+    return noteData;
+}
+
+export const aggregateNotesByTitle=async(authorization,title)=>{
+    const headUserId=await tokenHead(authorization);
+    const noteData=await notesRepository.getAll({title},{
+        title:1,userId:1,createdAt:1,user:1
+    },{
+        populate:{
+            path:'userId',
+            select:'name email'
+        }
+    })
+    const result=noteData.map((note)=>{
+        const noteObject=note.toObject();
+        return {
+            title:noteObject.title,
+            userId:noteObject.userId._id,
+            createdAt:noteObject.createdAt,
+            user:{
+                name:noteObject.userId.name,
+                email:noteObject.userId.email
+            }
+        }
+    })
+    if(!result.length){
+        throw new ConflictException('No note found')
+    }
+    return result;    
+}
+
+export const deleteNotes=async(authorization)=>{
+    const headUserId=await tokenHead(authorization);
+    const deletedNote=await notesRepository.deleteMany({userId:new Types.ObjectId(headUserId)});
 }
